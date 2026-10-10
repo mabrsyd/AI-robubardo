@@ -1,0 +1,43 @@
+{
+  "id": "img2img",
+  "name": "Product Reference to New Scene",
+  "description": "Place product image into a new scene using prompt guidance",
+  "workflowFile": "img2img.api.json",
+  "nodes": {
+    "loadImage": {
+      "id": "1",
+      "imageField": "image"
+    },
+    "sampler": {
+      "id": "3",
+      "seedField": "seed",
+      "stepsField": "steps",
+      "cfgField": "cfg",
+      "samplerNameField": "sampler_name",
+      "schedulerField": "scheduler",
+      "denoiseField": "denoise"
+    },
+    "checkpoint": {
+      "id": "4",
+      "ckptNameField": "ckpt_name"
+    },
+    "positivePrompt": {
+      "id": "6",
+      "textField": "text"
+    },
+    "negativePrompt": {
+      "id": "7",
+      "textField": "text"
+    },
+    "saveImage": {
+      "id": "9",
+      "filenamePrefixField": "filename_prefix"
+    }
+  },
+  "defaults": {
+    "steps": 20,
+    "cfg": 7,
+    "denoise": 0.65,
+    "negativePrompt": "blurry, low quality, distorted, watermark, poorly rendered"
+  }
+}

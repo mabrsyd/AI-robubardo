@@ -1,0 +1,47 @@
+{
+  "id": "txt2img",
+  "name": "Text to Image",
+  "description": "Generate product visuals from prompt using ComfyUI",
+  "workflowFile": "txt2img.api.json",
+  "nodes": {
+    "sampler": {
+      "id": "3",
+      "seedField": "seed",
+      "stepsField": "steps",
+      "cfgField": "cfg",
+      "samplerNameField": "sampler_name",
+      "schedulerField": "scheduler"
+    },
+    "checkpoint": {
+      "id": "4",
+      "ckptNameField": "ckpt_name"
+    },
+    "latent": {
+      "id": "5",
+      "widthField": "width",
+      "heightField": "height",
+      "batchSizeField": "batch_size"
+    },
+    "positivePrompt": {
+      "id": "6",
+      "textField": "text"
+    },
+    "negativePrompt": {
+      "id": "7",
+      "textField": "text"
+    },
+    "saveImage": {
+      "id": "9",
+      "filenamePrefixField": "filename_prefix"
+    }
+  },
+  "defaults": {
+    "width": 512,
+    "height": 512,
+    "steps": 20,
+    "cfg": 7,
+    "sampler": "euler",
+    "scheduler": "normal",
+    "negativePrompt": "blurry, low quality, distorted, extra limbs, poorly drawn, artifacts, watermark, lowres, oversaturated"
+  }
+}
