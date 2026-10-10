@@ -124,7 +124,7 @@ export class JobQueueWorker {
 
     // Step 4: Poll ComfyUI history
     const startTime = Date.now();
-    const timeoutMs = 180000; // 3 minutes timeout for RTX 2050
+    const timeoutMs = 600000; // 10 minutes timeout for RTX 2050 (allows cold start model load)
     let completedHistory = null;
 
     while (Date.now() - startTime < timeoutMs) {
@@ -147,7 +147,7 @@ export class JobQueueWorker {
 
       // Update progress simulation while running
       const elapsed = Date.now() - startTime;
-      const simulatedProgress = Math.min(90, Math.floor(50 + (elapsed / 40000) * 40));
+      const simulatedProgress = Math.min(95, Math.floor(50 + (elapsed / 60000) * 45));
       dbService.updateJob(job.id, { progress: simulatedProgress });
 
       await new Promise((resolve) => setTimeout(resolve, 1500));
