@@ -94,6 +94,7 @@ export class JobQueueWorker {
         height: job.height,
         steps: job.steps,
         cfg: job.cfg,
+        denoise: job.denoise ?? undefined,
         referenceImageFilename: job.referenceImage ?? undefined,
       });
       promptGraph = built.graph;

@@ -16,6 +16,7 @@ export interface GenerationJob {
   seed: number;
   steps: number;
   cfg: number;
+  denoise?: number | null;
   referenceImage?: string | null;
   comfyPromptId?: string | null;
   errorMessage?: string | null;
@@ -52,6 +53,7 @@ export class DatabaseService {
         seed INTEGER NOT NULL,
         steps INTEGER NOT NULL,
         cfg REAL NOT NULL,
+        denoise REAL DEFAULT 0.65,
         reference_image TEXT,
         comfy_prompt_id TEXT,
         error_message TEXT,
@@ -65,6 +67,12 @@ export class DatabaseService {
       CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
       CREATE INDEX IF NOT EXISTS idx_jobs_created_at ON jobs(created_at DESC);
     `);
+
+    try {
+      this.db.exec(`ALTER TABLE jobs ADD COLUMN denoise REAL DEFAULT 0.65;`);
+    } catch {
+      // Column already exists
+    }
   }
 
   public createJob(job: Omit<GenerationJob, 'progress' | 'createdAt' | 'updatedAt'>): GenerationJob {
@@ -79,12 +87,12 @@ export class DatabaseService {
     const stmt = this.db.prepare(`
       INSERT INTO jobs (
         id, status, workflow_type, prompt, negative_prompt,
-        width, height, seed, steps, cfg, reference_image,
+        width, height, seed, steps, cfg, denoise, reference_image,
         comfy_prompt_id, error_message, output_filename, output_url,
         progress, created_at, updated_at, completed_at
       ) VALUES (
         ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?,
+        ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?,
         ?, ?, ?, ?
       )
@@ -101,6 +109,7 @@ export class DatabaseService {
       fullJob.seed,
       fullJob.steps,
       fullJob.cfg,
+      fullJob.denoise ?? 0.65,
       fullJob.referenceImage ?? null,
       fullJob.comfyPromptId ?? null,
       fullJob.errorMessage ?? null,
@@ -191,6 +200,7 @@ export class DatabaseService {
       seed: Number(row.seed),
       steps: Number(row.steps),
       cfg: Number(row.cfg),
+      denoise: row.denoise !== undefined && row.denoise !== null ? Number(row.denoise) : 0.65,
       referenceImage: row.reference_image ? String(row.reference_image) : null,
       comfyPromptId: row.comfy_prompt_id ? String(row.comfy_prompt_id) : null,
       errorMessage: row.error_message ? String(row.error_message) : null,

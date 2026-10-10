@@ -3,7 +3,8 @@ import multer from 'multer';
 import path from 'node:path';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
-import { UPLOADS_DIR, CONFIG } from '../config.js';
+import { UPLOADS_DIR, CONFIG, PROJECT_ROOT } from '../config.js';
+import { comfyClient } from '../services/comfyui.js';
 
 const router = Router();
 
@@ -43,17 +44,29 @@ router.post('/', upload.single('referenceImage'), async (req, res) => {
     }
 
     const filename = req.file.filename;
+    const fileBuffer = await fs.promises.readFile(req.file.path);
 
-    // Optional sync to ComfyUI input directory if it exists
-    const comfyInputDir = path.resolve(process.cwd(), '../../ComfyUI/input');
-    if (fs.existsSync(comfyInputDir)) {
+    // Sync to all possible local ComfyUI input directories (Portable & standard)
+    const candidateInputDirs = [
+      path.resolve(PROJECT_ROOT, '../ComfyUI_windows_portable/ComfyUI/input'),
+      path.resolve(PROJECT_ROOT, '../ComfyUI/input'),
+      path.resolve(process.cwd(), '../../ComfyUI_windows_portable/ComfyUI/input'),
+      path.resolve(process.cwd(), '../../ComfyUI/input'),
+    ];
+
+    for (const inputDir of candidateInputDirs) {
       try {
-        const dest = path.resolve(comfyInputDir, filename);
-        fs.copyFileSync(req.file.path, dest);
+        if (fs.existsSync(inputDir)) {
+          const dest = path.resolve(inputDir, filename);
+          fs.copyFileSync(req.file.path, dest);
+        }
       } catch {
         // non-blocking
       }
     }
+
+    // Also forward via ComfyUI HTTP /upload/image endpoint if ComfyUI is online
+    comfyClient.uploadImage(fileBuffer, filename).catch(() => {});
 
     res.json({
       success: true,

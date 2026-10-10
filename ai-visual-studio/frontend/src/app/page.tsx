@@ -32,6 +32,7 @@ interface GenerationJob {
   seed: number;
   steps: number;
   cfg: number;
+  denoise?: number | null;
   referenceImage?: string | null;
   comfyPromptId?: string | null;
   errorMessage?: string | null;
@@ -102,6 +103,7 @@ export default function AIStudioPage() {
   const [randomizeSeed, setRandomizeSeed] = useState(true);
   const [steps, setSteps] = useState(20);
   const [cfg, setCfg] = useState(7.0);
+  const [denoise, setDenoise] = useState(0.65);
 
   // Reference image state
   const [referenceFile, setReferenceFile] = useState<File | null>(null);
@@ -254,6 +256,7 @@ export default function AIStudioPage() {
         seed: currentSeed,
         steps,
         cfg,
+        denoise,
         workflowType,
         referenceImage: uploadedReferenceFilename,
       };
@@ -558,6 +561,28 @@ export default function AIStudioPage() {
                       />
                     </div>
                   </div>
+
+                  {workflowType === 'img2img' && (
+                    <div className="pt-2 border-t border-slate-800/80">
+                      <div className="flex justify-between text-[11px] text-slate-400 mb-1">
+                        <span>Scene Transform Strength (Denoise)</span>
+                        <span className="font-mono text-indigo-400">{(denoise * 100).toFixed(0)}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0.2}
+                        max={0.9}
+                        step={0.05}
+                        value={denoise}
+                        onChange={(e) => setDenoise(Number(e.target.value))}
+                        className="w-full accent-indigo-500"
+                      />
+                      <div className="flex justify-between text-[10px] text-slate-500 mt-0.5">
+                        <span>Keep Product Details (30%)</span>
+                        <span>Transform Scene (80%)</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

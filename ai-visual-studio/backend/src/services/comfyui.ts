@@ -183,6 +183,22 @@ export class ComfyUIClient {
       // ignore
     }
   }
+
+  public async uploadImage(imageBuffer: Buffer, filename: string): Promise<boolean> {
+    try {
+      const blob = new Blob([new Uint8Array(imageBuffer)]);
+      const formData = new FormData();
+      formData.append('image', blob, filename);
+      formData.append('overwrite', 'true');
+      const res = await fetch(`${this.baseUrl}/upload/image`, {
+        method: 'POST',
+        body: formData,
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }
 }
 
 export const comfyClient = new ComfyUIClient();

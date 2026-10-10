@@ -18,6 +18,7 @@ router.post('/generate', async (req, res) => {
       height = CONFIG.defaultHeight,
       steps = CONFIG.defaultSteps,
       cfg = CONFIG.defaultCfg,
+      denoise = 0.65,
       workflowType = 'txt2img',
       referenceImage = null,
     } = req.body ?? {};
@@ -33,6 +34,7 @@ router.post('/generate', async (req, res) => {
     const clampedSteps = Math.max(10, Math.min(35, Number(steps) || 20));
     const cleanSeed = Math.abs(Number(seed)) || Math.floor(Math.random() * 2147483647);
     const cleanCfg = Math.max(1.0, Math.min(15.0, Number(cfg) || 7.0));
+    const cleanDenoise = Math.max(0.1, Math.min(1.0, Number(denoise) || 0.65));
 
     const jobId = `job_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
 
@@ -47,6 +49,7 @@ router.post('/generate', async (req, res) => {
       seed: cleanSeed,
       steps: clampedSteps,
       cfg: cleanCfg,
+      denoise: cleanDenoise,
       referenceImage: referenceImage ? String(referenceImage) : null,
     });
 

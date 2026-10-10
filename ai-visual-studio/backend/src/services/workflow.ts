@@ -67,6 +67,7 @@ export interface BuildWorkflowParams {
   cfg?: number;
   checkpoint?: string;
   referenceImageFilename?: string;
+  denoise?: number;
 }
 
 export class WorkflowService {
@@ -126,6 +127,9 @@ export class WorkflowService {
       }
       if (params.cfg !== undefined && nodes.sampler.cfgField) {
         node.inputs[nodes.sampler.cfgField] = params.cfg;
+      }
+      if (params.denoise !== undefined && nodes.sampler.denoiseField) {
+        node.inputs[nodes.sampler.denoiseField] = params.denoise;
       }
     }
 
